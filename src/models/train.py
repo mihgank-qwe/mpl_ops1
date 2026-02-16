@@ -98,10 +98,17 @@ def plot_and_save_roc_curve(y_test, y_pred_proba, output_path):
     plt.close()
 
 
+def _mlflow_tracking_uri():
+    """Путь к mlruns в корне проекта (абсолютный), чтобы run были видны в mlflow ui из корня"""
+    root = Path(__file__).resolve().parents[2]
+    path = (root / "mlruns").as_posix()
+    return "file:///" + path if not path.startswith("/") else "file:" + path
+
+
 def main():
     X_train, X_test, y_train, y_test = load_data()
 
-    mlflow.set_tracking_uri("file:///./mlruns")
+    mlflow.set_tracking_uri(_mlflow_tracking_uri())
     mlflow.set_experiment("Credit_Default_Prediction")
 
     with mlflow.start_run():
@@ -184,7 +191,7 @@ EXPERIMENT_CONFIGS = [
 
 
 def run_one_experiment(X_train, X_test, y_train, y_test, param_dist, run_name, save_model=False):
-    """Один эксперимент с заданным param_dist. """
+    """Один эксперимент с заданным param_dist """
     project_root = Path(__file__).resolve().parents[2]
 
     with mlflow.start_run(run_name=run_name):
@@ -242,7 +249,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     X_train, X_test, y_train, y_test = load_data()
-    mlflow.set_tracking_uri("file:///./mlruns")
+    mlflow.set_tracking_uri(_mlflow_tracking_uri())
     mlflow.set_experiment("Credit_Default_Prediction")
 
     if args.experiments >= 5:
@@ -253,6 +260,7 @@ if __name__ == "__main__":
                 run_name=f"exp_{i+1}",
                 save_model=(i == 4),
             )
-        print("Запустите mlflow ui для просмотра 5 экспериментов")
+        print("Запустите из корня проекта: mlflow ui")
+        print("Затем откройте http://localhost:5000")
     else:
         main()
