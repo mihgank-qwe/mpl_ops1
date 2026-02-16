@@ -157,7 +157,11 @@ python scripts/drift_monitor.py --api-url http://localhost:8000
 
 ```bash
 pytest tests -v
+```
+
 ![https://github.com/mihgank-qwe/vremeni_ryadi_exam/raw/main/images/img1.png]
+
+```bash
 black --check src tests
 flake8 src tests --max-line-length=88
 ```
