@@ -159,7 +159,7 @@ python scripts/drift_monitor.py --api-url http://localhost:8000
 pytest tests -v
 ```
 
-![Image alt](https://github.com/mihgank-qwe/vremeni_ryadi_exam/raw/main/images/img1.png)
+![Image alt](https://github.com/mihgank-qwe/mpl_ops1/blob/main/images/img1.png)
 
 ```bash
 black --check src tests
