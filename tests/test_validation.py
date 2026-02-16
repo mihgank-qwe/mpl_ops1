@@ -7,7 +7,7 @@ from src.data.validation import validate_credit_data
 
 
 def test_validation_passes_on_valid_data():
-    """Валидация проходит на корректных данных"""
+    """Проверка, что валидация проходит на корректных данных"""
     valid_df = pd.DataFrame({
         "LIMIT_BAL": [20000.0, 50000.0],
         "SEX": [1, 2],
@@ -24,7 +24,7 @@ def test_validation_passes_on_valid_data():
 
 
 def test_validation_fails_on_null_target():
-    """Валидация падает при null в целевой переменной"""
+    """Проверка, что валидация падает при null в целевой переменной"""
     invalid_df = pd.DataFrame({
         "LIMIT_BAL": [20000.0],
         "SEX": [1],
@@ -41,7 +41,7 @@ def test_validation_fails_on_null_target():
 
 
 def test_validation_fails_on_invalid_target_values():
-    """Валидация падает при значениях целевой не 0 и не 1"""
+    """Проверка, что валидация падает при значениях целевой не 0 и не 1"""
     invalid_df = pd.DataFrame({
         "LIMIT_BAL": [20000.0],
         "SEX": [1],
@@ -58,7 +58,7 @@ def test_validation_fails_on_invalid_target_values():
 
 
 def test_validation_fails_on_invalid_age():
-    """Валидация падает при возрасте вне 18-100"""
+    """Проверка, что валидация падает при возрасте вне 18-100"""
     invalid_df = pd.DataFrame({
         "LIMIT_BAL": [20000.0],
         "SEX": [1],
@@ -75,7 +75,7 @@ def test_validation_fails_on_invalid_age():
 
 
 def test_validate_processed_data_file():
-    """Валидация проходит на обработанных данных"""
+    """Проверка, что валидация проходит на обработанных данных"""
     from pathlib import Path
     from src.data.validation import validate_data_file
 
