@@ -44,16 +44,28 @@ python src/data/make_dataset.py data/raw/UCI_Credit_Card.csv data/processed/
 python src/models/train.py
 ```
 
-Модель сохраняется в `models/credit_default_model.pkl`, метрики - в `metrics.json` и MLflow
+Один запуск: одна модель в `models/credit_default_model.pkl`, метрики в `metrics.json` и MLflow.
 
-### 3. DVC pipeline (опционально)
+**5 экспериментов для MLflow:**
+
+```bash
+python src/models/train.py --experiments 5
+```
+
+В MLflow появятся 5 запусков с разными гиперпараметрами. Просмотр: `mlflow ui`.
+
+### 3. EDA
+
+Ноутбук разведки: `notebooks/01_eda.ipynb`.
+
+### 4. DVC pipeline (опционально)
 
 ```bash
 dvc init
 dvc repro
 ```
 
-### 4. Запуск API
+### 5. Запуск API
 
 ```bash
 uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
@@ -61,17 +73,16 @@ uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
 
 Документация: http://localhost:8000/docs
 
-### 5. Docker
+### 6. Docker
 
 ```bash
-# Сначала обучите модель (шаги 1–2)
 docker build -t credit-api .
 docker run -p 8000:8000 credit-api
 ```
 
 Или используйте скрипт: `./scripts/build_and_run.sh` (Linux/Mac) или `scripts\build_and_run.ps1` (Windows).
 
-### 6. Пример запроса к API
+### 7. Пример запроса к API
 
 ```bash
 curl -X POST http://localhost:8000/predict \
@@ -88,17 +99,65 @@ curl -X POST http://localhost:8000/predict \
   }'
 ```
 
-### 7. Мониторинг дрифта
+### 8. Мониторинг дрифта
 
 ```bash
 # Запустите API, затем:
 python scripts/drift_monitor.py --api-url http://localhost:8000
 ```
 
+## Демонстрация результатов
+
+### Резюме проекта
+
+Реализован сквозной пайплайн: загрузка и валидация данных (Pandera, Great Expectations в CI), feature engineering, обучение модели (Sklearn Pipeline + GradientBoosting), логирование в MLflow, DVC-пайплайн, REST API (FastAPI), Docker, мониторинг дрифта (PSI), unit-тесты и CI (GitHub Actions).
+
+### Результаты модели (тестовая выборка)
+
+После обучения (`python src/models/train.py` или `dvc repro`) метрики сохраняются в `metrics.json` и в MLflow. Пример итоговых метрик на отложенной выборке:
+
+| Метрика   | Значение |
+| --------- | -------- |
+| ROC-AUC   | 0.776    |
+| Precision | 0.67     |
+| Recall    | 0.36     |
+| F1-Score  | 0.47     |
+
+При запуске `python src/models/train.py --experiments 5` в MLflow появляется 5 запусков с разными гиперпараметрами. лучший по AUC можно выбрать в UI (`mlflow ui` → http://localhost:5000).
+
+### Выходы пайплайна
+
+| Этап    | Вход                           | Выход                                                                 |
+| ------- | ------------------------------ | --------------------------------------------------------------------- |
+| prepare | `data/raw/UCI_Credit_Card.csv` | `data/processed/train.csv`, `test.csv`                                |
+| train   | train.csv, test.csv            | `models/credit_default_model.pkl`, `metrics.json`, артефакты в MLflow |
+
+### Пример ответа API
+
+Запрос `POST /predict` с JSON признаков клиента возвращает класс и вероятность дефолта:
+
+```json
+{
+  "default_prediction": 1,
+  "default_probability": 0.82
+}
+```
+
+Интерактивная документация и проверка: http://localhost:8000/docs после запуска `uvicorn src.api.app:app --reload`.
+
+### Где посмотреть
+
+- **Эксперименты и метрики:** `mlflow ui` → http://localhost:5000
+- **CI (тесты, линтинг, валидация):** вкладка Actions в репозитории GitHub
+- **EDA:** ноутбук `notebooks/01_eda.ipynb`
+
+---
+
 ## Тестирование
 
 ```bash
 pytest tests -v
+![https://github.com/mihgank-qwe/vremeni_ryadi_exam/raw/main/images/img1.png]
 black --check src tests
 flake8 src tests --max-line-length=88
 ```
