@@ -34,8 +34,7 @@ env/
 
 # DVC
 mlruns/
-.dvc/
-*.dvc
+.dvc/cache/
 
 # OS
 .DS_Store
@@ -44,6 +43,7 @@ Thumbs.db
 # Project
 data/processed/*.csv
 models/*.pkl
+roc_curve.png
 
 # Raw data
 data/raw/*.csv

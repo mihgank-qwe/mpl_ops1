@@ -50,15 +50,20 @@ df.to_csv('data/raw/UCI_Credit_Card.csv', index=False)
       - name: Run Flake8
         run: flake8 src tests --max-line-length=88 --extend-ignore=E203,W503
 
-      - name: Валидация данных
+      - name: Валидация данных (Pandera)
         run: python -c "
 from src.data.validation import validate_data_file
 from pathlib import Path
 train_path = Path('data/processed/train.csv')
 assert train_path.exists(), 'Данные train не найдены'
 validate_data_file(train_path)
-print('Валидация пройдена')
+print('Валидация Pandera пройдена')
 "
+
+      - name: Валидация данных (Great Expectations)
+        run: |
+          pip install great-expectations==0.18.21
+          python scripts/validate_ge.py
 
       - name: Run tests
         run: pytest tests -v
